@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Food Inventory</title>
+<style>
+:root{--bg:#faf8f4;--card:#fff;--text:#1f2a24;--muted:#6b7a70;--line:#e6e2d9;--accent:#2f7d4f;--chip:#e8f2ec;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a16;--card:#1d2620;--text:#eef3ef;--muted:#93a499;--line:#2c3a31;--accent:#6fcf97;--chip:#233a2c}}
+:root[data-theme="dark"]{--bg:#141a16;--card:#1d2620;--text:#eef3ef;--muted:#93a499;--line:#2c3a31;--accent:#6fcf97;--chip:#233a2c}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:14px 16px 10px;border-bottom:1px solid var(--line);z-index:2}
+h1{margin:0 0 2px;font-size:22px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:10px}
+input{width:100%;padding:11px 14px;font-size:16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text)}
+main{padding:12px 16px 32px;max-width:640px;margin:0 auto}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:13px 14px;font-weight:600;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+.n{background:var(--chip);color:var(--accent);border-radius:999px;font-size:13px;padding:2px 10px;font-weight:600}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid var(--line)}
+.q{color:var(--muted);text-align:right;white-space:nowrap;font-size:14px}
+.sc{display:inline-block;min-width:34px;text-align:center;border-radius:8px;padding:1px 6px;font-size:13px;font-weight:700;margin-right:8px}.g{background:#d8f0e0;color:#17613a}.y{background:#fdf0c9;color:#7a5800}.r{background:#fbd9d6;color:#9b2318}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .g{background:#1f4a31;color:#9be8bb}:root:not([data-theme="light"]) .y{background:#4d4012;color:#f3d77a}:root:not([data-theme="light"]) .r{background:#53211d;color:#f5a59d}}.tabs{display:flex;gap:6px;margin-top:10px}.tab{flex:1;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font:600 14px inherit;cursor:pointer}.tab.on{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:12px;padding:14px}.card.l{padding:0}.card .row:first-child{border-top:0}
+.rk{display:inline-block;min-width:26px;color:var(--muted);font-size:13px}
+.big{font-size:40px;font-weight:700;line-height:1}.big small{font-size:16px;color:var(--muted);font-weight:500}
+h2{font-size:15px;margin:0 0 10px}.cap{color:var(--muted);font-size:12px;margin-top:6px;display:flex;justify-content:space-between}
+.spec{display:flex;height:30px;border-radius:8px;overflow:hidden}.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden;margin:4px 0 10px;display:flex}.bar i{display:block;height:100%}
+.bl{display:flex;justify-content:space-between;font-size:14px}
+.empty{text-align:center;color:var(--muted);padding:30px 0}
+</style>
+</head>
+<body>
+<header>
+<h1>🥫 Food Inventory</h1>
+<div class="sub" id="sub"></div><div class="sub">Health score 1–10: <span class="sc g">8+</span><span class="sc y">5–7</span><span class="sc r">1–4</span></div>
+<input id="s" type="search" placeholder="Search foods…" autocomplete="off">
+<div class="tabs"><button class="tab on" data-t="m">Inventory</button><button class="tab" data-t="r">Ranking</button><button class="tab" data-t="h">Health Map</button></div>
+</header>
+<main id="m"></main><main id="r" hidden></main><main id="h" hidden></main>
+<script>
+var D={
+"Oils, Spices & Condiments":[["EVOO spray","100 servings",8,0],["EVOO oil","40 servings",8,4800],["Avocado oil","15 servings",7,1800],["Vegetable oil","48 oz",3,11500],["Sea salt (fine)","Almost finished",5,0],["Black pepper","Full",9,0],["Ground cumin","2.5 oz",9,260],["Onion powder","Little bit",8,30],["Garlic powder (Costco)","Full",8,800],["Chili powder","1 oz",9,80],["Za'atar","1.4 oz",9,110],["Oregano","0.8 oz",9,60],["Italian seasoning","0.5 oz",9,40],["Ground turmeric","2 oz",9,170],["Ground cardamom","1.4 oz",9,120],["Sesame seeds","2 oz",9,320],["Balsamic vinegar","8.5 oz",6,230],["Rice vinegar","6 oz",6,60],["Sesame seed oil","5 oz",7,1200],["Low sodium soy sauce","7 oz",5,130],["Cholula sauce","4 oz",6,30],["Vanilla extract","3 oz",6,210],["Pure maple syrup","8 oz",4,590],["Jalapeño jelly","19 oz",3,1350],["Dubai honey","10 oz",4,860],["Local honey","20 oz",5,1720]],
+"Produce":[["Avocado","1",10,240],["Ginger root (finger size)","1",9,10],["Mandarin oranges","5",10,235]],
+"Protein & Supplements":[["Whey powder (vanilla ice cream)","80 servings",7,9600],["Creatine","135 servings",7,0],["Liquid IV sticks","25",5,400],["Protein peanut butter","1 oz",6,170],["Cooked chicken breast","200 g",9,330],["Cooked chicken breast","300 g",9,495],["Large white eggs","9",9,650],["Albacore Kirkland tuna cans","4",8,720],["Safe Catch tuna cans","6",9,720]],
+"Dairy":[["Mexican blend shredded cheese","2 cups",6,900],["Parmesan cheese","1 oz",6,110],["Whipped cream cheese spread","4 oz",5,300],["Greek yogurt, plain non-fat","80 oz",9,1340],["2% milk","1/6 gallon",7,320],["Mozzarella sticks (frozen)","4 lb",3,5300]],
+"Sauces & Packets":[["Chick-fil-A sauce packet","1",2,140],["Cookout sauce packet","1",2,100],["Guacamole","2 oz",7,90],["Sriracha hot chili sauce","8 oz",5,240],["Sriracha mayo","10 oz",3,1300],["Sweet Baby Ray's BBQ sauce","14 oz",3,770]],
+"Drinks":[["Stōk cold coffee","72 oz",6,70],["Dunkin ground coffee","130 servings",7,0],["Masala black tea bags","70",8,0]],
+"Grains, Pasta & Legumes":[["Sushi rice","4 lb",5,6500],["Tri-color quinoa","8 oz",9,835],["Red lentils","3 oz",10,300],["Green lentils","16 oz",10,1590],["Fettuccine pasta","8 oz",5,800],["Maggi noodles","4 packs",3,1200],["Ramen noodles","11 packs",3,4200],["Bleached flour","24 oz",3,2450],["Burrito flour tortillas","7",5,2100],["Plain Costco bagels","1 pack",4,1700],["Yaki sushi nori","6 sheets",8,30]],
+"Baking & Pantry":[["Sugar","3 lb",2,5300],["Flax seed","1 lb",9,2400],["Hulled hemp seed","10 oz",9,1560],["Black chia seed","15 oz",10,2070],["Aldi chewy fudge brownie mix","1 pack",2,1900],["Banana chips","8 oz",4,1180]],
+"Dates":[["Khalas dates","10 oz",6,790],["Medjool dates","40 oz",6,3140],["Chocolate-covered dates w/ almond","250 g",4,1000]],
+"Frozen":[["Frozen strawberry","6 lb",9,870],["Frozen mango","5 lb",9,1360],["Kirkland pepperoni pizzas","3",3,6300],["Organic potstickers","0.5 lb",5,450]],
+"Chocolate & Sweets":[["Dark chocolate bars (various %)","5 bars",7,2750],["Swiss Miss milk chocolate packet","1",2,80],["Aldi Oreos","1 pack",2,1900],["Reese's filled pretzel (~130 cal)","7",2,910],["Moser Roth dark chocolate pack","1",6,770],["Moser Roth white chocolate pack","1",2,780],["Dubai chocolate","770 g",2,4200],["Dark Belgian chocolate (Costco)","24 oz",6,3700],["Pop Rocks candy","1",1,40],["Butterfinger bars","8 × 1.9 oz",1,2000],["Crunch bars","4 × 1.55 oz",2,920],["Kinder Bueno bars","4 × 1.5 oz",2,920],["Trolli Sour Brite Crawlers","1 × 3.5 oz",1,350]],
+"Snacks":[["Golden Hour snack bar","1",5,200],["Belvita biscuit pack","1",4,230]]
+};
+var CE={"Oils, Spices & Condiments":"🫒","Produce":"🥑","Protein & Supplements":"💪","Dairy":"🧀","Sauces & Packets":"🌶️","Drinks":"☕","Grains, Pasta & Legumes":"🍚","Baking & Pantry":"🌾","Dates":"🌴","Frozen":"🧊","Chocolate & Sweets":"🍫","Snacks":"🍪"};
+var KW=[["spray","🧴"],["oil","🫒"],["salt","🧂"],["pepper","🌶️"],["cumin","🌿"],["onion","🧅"],["garlic","🧄"],["chili powder","🌶️"],["za'atar","🌿"],["oregano","🌿"],["italian","🌿"],["turmeric","🟡"],["cardamom","🌿"],["sesame seeds","⚪"],["vinegar","🍶"],["soy","🥢"],["cholula","🌶️"],["vanilla","🍦"],["maple","🍁"],["jelly","🍇"],["honey","🍯"],["avocado","🥑"],["ginger","🫚"],["mandarin","🍊"],["whey","🥛"],["creatine","💊"],["liquid iv","💧"],["peanut","🥜"],["chicken","🍗"],["eggs","🥚"],["tuna","🐟"],["cheese","🧀"],["yogurt","🥛"],["milk","🥛"],["mozzarella","🧀"],["sauce","🥫"],["guacamole","🥑"],["sriracha","🌶️"],["bbq","🍖"],["coffee","☕"],["tea","🍵"],["rice","🍚"],["quinoa","🌾"],["lentil","🫘"],["fettuccine","🍝"],["noodle","🍜"],["flour","🌾"],["tortilla","🌯"],["bagel","🥯"],["nori","🍙"],["sugar","🍚"],["flax","🌱"],["hemp","🌱"],["chia","🌱"],["brownie","🍫"],["banana","🍌"],["dates","🌴"],["strawberry","🍓"],["mango","🥭"],["pizza","🍕"],["potsticker","🥟"],["oreo","🍪"],["reese","🥨"],["pop rocks","💥"],["butterfinger","🍫"],["crunch","🍫"],["kinder","🍫"],["trolli","🍬"],["chocolate","🍫"],["swiss miss","☕"],["bar","🍫"],["belvita","🍪"]];
+function emo(n){var l=n.toLowerCase();for(var i=0;i<KW.length;i++)if(l.indexOf(KW[i][0])>-1)return KW[i][1];return "🍽️"}
+var m=document.getElementById('m'),s=document.getElementById('s'),sub=document.getElementById('sub');
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function render(){
+  var q=s.value.trim().toLowerCase(),h='',total=0,open=q?' open':'';
+  for(var c in D){
+    var items=D[c].filter(function(i){return !q||i[0].toLowerCase().indexOf(q)>-1||c.toLowerCase().indexOf(q)>-1});
+    if(!items.length)continue;
+    total+=items.length;
+    h+='<details'+open+'><summary>'+(CE[c]||'')+' '+esc(c)+'<span class="n">'+items.length+'</span></summary>';
+    items.forEach(function(i){h+='<div class="row"><span>'+emo(i[0])+' '+esc(i[0])+'</span><span class="q"><span class="sc '+(i[2]>=8?'g':i[2]>=5?'y':'r')+'">'+i[2]+'</span>'+esc(i[1])+'</span></div>'});
+    h+='</details>';
+  }
+  m.innerHTML=h||'<div class="empty">No matches</div>';
+  sub.textContent=total+' items'+(q?' found':' in your home');
+}
+var ALL=[];for(var c in D)D[c].forEach(function(i){ALL.push({c:c,n:i[0],q:i[1],s:i[2],k:i[3]})});
+function col(s){return 'hsl('+((s-1)/9*120)+',60%,45%)'}
+function bd(s){return s>=8?'g':s>=5?'y':'r'}
+function fm(n){return Math.round(n).toLocaleString()}
+var BC={g:'hsl(135,55%,42%)',y:'hsl(45,85%,52%)',r:'hsl(5,70%,50%)'},BN={g:'Healthy (8–10)',y:'Middle (5–7)',r:'Unhealthy (1–4)'};
+function ranking(){
+  var R=ALL.slice().sort(function(a,b){return b.s-a.s||b.k-a.k}),h='<div class="card l">';
+  R.forEach(function(x,i){h+='<div class="row"><span><span class="rk">'+(i+1)+'</span>'+emo(x.n)+' '+esc(x.n)+'</span><span class="q"><span class="sc '+bd(x.s)+'">'+x.s+'</span>'+fm(x.k)+' cal</span></div>'});
+  document.getElementById('r').innerHTML=h+'</div>';
+}
+function hmap(){
+  var tot=0,ws=0,B={g:0,y:0,r:0},S=[],C={},i,x;
+  for(i=0;i<=10;i++)S[i]=0;
+  ALL.forEach(function(x){tot+=x.k;ws+=x.k*x.s;B[bd(x.s)]+=x.k;S[x.s]+=x.k;var o=C[x.c]||(C[x.c]={g:0,y:0,r:0,t:0});o[bd(x.s)]+=x.k;o.t+=x.k});
+  var h='<div class="card"><div class="cap" style="margin:0 0 6px"><span>Calorie-weighted pantry score</span></div><div class="big">'+(ws/tot).toFixed(1)+'<small> / 10</small></div><div class="cap"><span>'+fm(tot)+' total calories</span><span>'+ALL.length+' items</span></div></div>';
+  h+='<div class="card"><h2>Calorie spectrum</h2><div class="spec">';
+  for(i=1;i<=10;i++)if(S[i])h+='<div style="width:'+S[i]/tot*100+'%;background:'+col(i)+'" title="Score '+i+'"></div>';
+  h+='</div><div class="cap"><span>Unhealthy</span><span>Healthy</span></div></div>';
+  h+='<div class="card"><h2>Calories by health band</h2>';
+  ['g','y','r'].forEach(function(k){var p=B[k]/tot*100;h+='<div class="bl"><span>'+BN[k]+'</span><b>'+p.toFixed(0)+'% · '+fm(B[k])+'</b></div><div class="bar"><i style="width:'+p+'%;background:'+BC[k]+'"></i></div>'});
+  h+='</div><div class="card"><h2>By category</h2>';
+  var mx=0;for(var c in C)mx=Math.max(mx,C[c].t);
+  Object.keys(C).sort(function(a,b){return C[b].t-C[a].t}).forEach(function(c){var o=C[c];h+='<div class="bl"><span>'+(CE[c]||'')+' '+esc(c)+'</span><b>'+fm(o.t)+'</b></div><div class="bar" style="width:'+Math.max(o.t/mx*100,2)+'%">';
+    ['g','y','r'].forEach(function(k){if(o[k])h+='<i style="width:'+o[k]/o.t*100+'%;background:'+BC[k]+'"></i>'});h+='</div>'});
+  h+='</div><div class="card l"><div style="padding:14px 14px 4px"><h2>Biggest unhealthy calorie sources</h2></div>';
+  ALL.filter(function(x){return x.s<=4}).sort(function(a,b){return b.k-a.k}).slice(0,8).forEach(function(x){h+='<div class="row"><span>'+emo(x.n)+' '+esc(x.n)+'</span><span class="q"><span class="sc r">'+x.s+'</span>'+fm(x.k)+'</span></div>'});
+  document.getElementById('h').innerHTML=h+'</div>';
+}
+function show(t){
+  ['m','r','h'].forEach(function(k){document.getElementById(k).hidden=k!==t});
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('on',b.dataset.t===t)});
+  s.style.display=sub.style.display=t==='m'?'':'none';window.scrollTo(0,0);
+}
+document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.t)})});
+ranking();hmap();
+s.addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
